@@ -1,4 +1,5 @@
 import './style.css'
+import './features/toggle-completed'
 
 
 // structure of the data schema
@@ -68,4 +69,3 @@ const removeTodo = (id:number):void => {
   todos = todos.filter(todo => todo.id !== id);
   renderTodos();
 }
-
