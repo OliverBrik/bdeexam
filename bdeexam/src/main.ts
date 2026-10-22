@@ -1,14 +1,9 @@
 import './style.css'
-import './features/toggle-completed'
+import { toggleCompleted } from './features/toggle-completed'
+import type { Todo } from './features/toggle-completed'
 
 
 // structure of the data schema
-interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
-
 let todos: Todo[] = [];
 
 const todoInput = document.getElementById('todo-input') as HTMLInputElement;
@@ -34,10 +29,14 @@ const renderTodos = ():void => {
     const li = document.createElement('li');
     li.className = 'todo-item';
     li.innerHTML = `
-      <span>${todo.text}</span>
-      <button>Remove</button>
+      <span class="${todo.completed ? 'completed' : ''}">${todo.text}</span>
+      <div>
+        <button class="complete-button">${todo.completed ? 'Undo' : 'Complete'}</button>
+        <button class="remove-button">Remove</button>
+      </div>
     `;
     addRemoveButtonListener(li, todo.id);
+    addToggleCompletedButtonListener(li, todo.id);
     todoList.appendChild(li);
   });
 }
@@ -57,12 +56,18 @@ todoForm.addEventListener('submit', (event: Event) => {
 
 })
 
-const errorMessage = document.getElementById('error-message') as HTMLParagraphElement;
-
 const addRemoveButtonListener = (li: HTMLLIElement, id: number):void => {
-  const removeButton = li.querySelector('button');
+  const removeButton = li.querySelector('.remove-button');
   removeButton?.addEventListener('click', () => {removeTodo(id)});
     
+}
+
+const addToggleCompletedButtonListener = (li: HTMLLIElement, id: number):void => {
+  const completeButton = li.querySelector('.complete-button');
+  completeButton?.addEventListener('click', () => {
+    todos = toggleCompleted(todos, id);
+    renderTodos();
+  });
 }
 
 const removeTodo = (id:number):void => {
