@@ -12,6 +12,11 @@
       <h1>Todo App</h1>
       <form class="todo-form">
       <input type="text" placeholder="Add a new todo..." id="todo-input">
+      <select id="priority-input" aria-label="Todo priority">
+        <option value="low">Low priority</option>
+        <option value="medium" selected>Medium priority</option>
+        <option value="high">High priority</option>
+      </select>
       <button type="submit">Add</button>
       </form>
       <p id="error-message">Please enter a valid todo.</p>
