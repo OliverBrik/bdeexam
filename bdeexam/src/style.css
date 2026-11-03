@@ -75,10 +75,19 @@ h1 {
 }
 .todo-item button {
   border: none;
-  background: #dc3545;
   color: #fff;
   border-radius: 3px;
   cursor: pointer;
+}
+.complete-button {
+  background: #28a745;
+}
+.remove-button {
+  background: #dc3545;
+}
+.completed {
+  text-decoration: line-through;
+  color: #6c757d;
 }
 
 

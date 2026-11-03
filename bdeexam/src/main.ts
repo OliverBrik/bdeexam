@@ -1,7 +1,11 @@
+import './style.css'
+import { toggleCompleted } from './features/toggle-completed'
+import type { Todo } from './features/toggle-completed'
 import './style.css';
 
 type Priority = 'low' | 'medium' | 'high';
 
+// structure of the data schema
 interface Todo {
   id: number;
   text: string;
@@ -39,6 +43,15 @@ const renderTodos = (): void => {
   todos.forEach(todo => {
     const li = document.createElement('li');
     li.className = 'todo-item';
+    li.innerHTML = `
+      <span class="${todo.completed ? 'completed' : ''}">${todo.text}</span>
+      <div>
+        <button class="complete-button">${todo.completed ? 'Undo' : 'Complete'}</button>
+        <button class="remove-button">Remove</button>
+      </div>
+    `;
+    addRemoveButtonListener(li, todo.id);
+    addToggleCompletedButtonListener(li, todo.id);
 
     const text = document.createElement('span');
     text.textContent = todo.text;
@@ -73,4 +86,25 @@ todoForm.addEventListener('submit', (event: SubmitEvent) => {
   }
 });
 
+
+})
+
+const addRemoveButtonListener = (li: HTMLLIElement, id: number):void => {
+  const removeButton = li.querySelector('.remove-button');
+  removeButton?.addEventListener('click', () => {removeTodo(id)});
+    
+}
+
+const addToggleCompletedButtonListener = (li: HTMLLIElement, id: number):void => {
+  const completeButton = li.querySelector('.complete-button');
+  completeButton?.addEventListener('click', () => {
+    todos = toggleCompleted(todos, id);
+    renderTodos();
+  });
+}
+
+const removeTodo = (id:number):void => {
+  todos = todos.filter(todo => todo.id !== id);
+  renderTodos();
+}
 renderTodos();
