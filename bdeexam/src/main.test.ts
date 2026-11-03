@@ -28,6 +28,14 @@ describe('Todo List', () => {
         expect(result[0].text).toBe('Test Todo');
         expect(result[0].completed).toBe(false);
     });
-    
-})
 
+    it('should remove a todo', () => {
+        const todos: Todo[] = [
+            { id: 1, text: 'Test Todo', completed: false }
+        ];
+
+        const result = removeTodo(todos, 1);
+
+        expect(result).toHaveLength(0);
+    });
+})
