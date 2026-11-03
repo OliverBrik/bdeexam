@@ -1,4 +1,5 @@
 import './style.css'
+import { initializeColorPicker } from './features/color-picker'
 
 
 // structure of the data schema
@@ -13,6 +14,8 @@ let todos: Todo[] = [];
 const todoInput = document.getElementById('todo-input') as HTMLInputElement;
 const todoForm = document.querySelector('.todo-form') as HTMLFormElement;
 const todoList = document.getElementById('todo-list') as HTMLUListElement;
+
+initializeColorPicker(document);
 
 const addTodo = (text:string):void => {
   const newTodo: Todo = {
@@ -68,4 +71,3 @@ const removeTodo = (id:number):void => {
   todos = todos.filter(todo => todo.id !== id);
   renderTodos();
 }
-
