@@ -1,12 +1,9 @@
-import './style.css'
-import { initializeColorPicker } from './features/color-picker'
-import { toggleCompleted } from './features/toggle-completed'
-import type { Todo } from './features/toggle-completed'
 import './style.css';
+import { initializeColorPicker } from './features/color-picker';
 
 type Priority = 'low' | 'medium' | 'high';
+type TodoFilter = 'all' | 'completed' | 'not-completed' | Priority;
 
-// structure of the data schema
 interface Todo {
   id: number;
   text: string;
@@ -15,15 +12,72 @@ interface Todo {
 }
 
 let todos: Todo[] = [];
+let currentFilter: TodoFilter = 'all';
 
-const todoInput = document.getElementById('todo-input') as HTMLInputElement;
-const priorityInput = document.getElementById('priority-input') as HTMLSelectElement;
-const todoForm = document.querySelector('.todo-form') as HTMLFormElement;
-const todoList = document.getElementById('todo-list') as HTMLUListElement;
+const todoInput = document.getElementById('todo-input');
+
+if (!(todoInput instanceof HTMLInputElement)) {
+  throw new Error('Todo input element was not found.');
+}
+
+const priorityInput = document.getElementById('priority-input');
+
+if (!(priorityInput instanceof HTMLSelectElement)) {
+  throw new Error('Priority input element was not found.');
+}
+
+const todoForm = document.querySelector('.todo-form');
+
+if (!(todoForm instanceof HTMLFormElement)) {
+  throw new Error('Todo form element was not found.');
+}
+
+const todoList = document.getElementById('todo-list');
+
+if (!(todoList instanceof HTMLUListElement)) {
+  throw new Error('Todo list element was not found.');
+}
 
 initializeColorPicker(document);
 
-const addTodo = (text:string):void => {
+const createFilterInput = (): HTMLSelectElement => {
+  const existingFilterInput = document.getElementById('filter-input');
+
+  if (existingFilterInput instanceof HTMLSelectElement) {
+    return existingFilterInput;
+  }
+
+  const label = document.createElement('label');
+  label.htmlFor = 'filter-input';
+  label.textContent = 'Filter tasks:';
+
+  const filterSelect = document.createElement('select');
+  filterSelect.id = 'filter-input';
+
+  const filters: Array<{ value: TodoFilter; label: string }> = [
+    { value: 'all', label: 'All tasks' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'not-completed', label: 'Not completed' },
+    { value: 'low', label: 'Low priority' },
+    { value: 'medium', label: 'Medium priority' },
+    { value: 'high', label: 'High priority' }
+  ];
+
+  filters.forEach(filter => {
+    const option = document.createElement('option');
+    option.value = filter.value;
+    option.textContent = filter.label;
+    filterSelect.appendChild(option);
+  });
+
+  todoForm.insertAdjacentElement('afterend', label);
+  label.insertAdjacentElement('afterend', filterSelect);
+
+  return filterSelect;
+};
+
+const filterInput = createFilterInput();
+
 const addTodo = (text: string, priority: Priority): void => {
   const newTodo: Todo = {
     id: Date.now(),
@@ -41,28 +95,59 @@ const removeTodo = (id: number): void => {
   renderTodos();
 };
 
+const toggleTodoCompleted = (id: number): void => {
+  todos = todos.map(todo =>
+    todo.id === id
+      ? { ...todo, completed: !todo.completed }
+      : todo
+  );
+
+  renderTodos();
+};
+
+const getFilteredTodos = (): Todo[] => {
+  switch (currentFilter) {
+    case 'completed':
+      return todos.filter(todo => todo.completed);
+
+    case 'not-completed':
+      return todos.filter(todo => !todo.completed);
+
+    case 'low':
+    case 'medium':
+    case 'high':
+      return todos.filter(todo => todo.priority === currentFilter);
+
+    case 'all':
+      return todos;
+  }
+};
+
 const renderTodos = (): void => {
   todoList.innerHTML = '';
 
-  todos.forEach(todo => {
-    const li = document.createElement('li');
-    li.className = 'todo-item';
-    li.innerHTML = `
-      <span class="${todo.completed ? 'completed' : ''}">${todo.text}</span>
-      <div>
-        <button class="complete-button">${todo.completed ? 'Undo' : 'Complete'}</button>
-        <button class="remove-button">Remove</button>
-      </div>
-    `;
-    addRemoveButtonListener(li, todo.id);
-    addToggleCompletedButtonListener(li, todo.id);
+  getFilteredTodos().forEach(todo => {
+    const listItem = document.createElement('li');
+    listItem.className = 'todo-item';
 
     const text = document.createElement('span');
     text.textContent = todo.text;
 
+    if (todo.completed) {
+      text.className = 'completed';
+    }
+
     const priority = document.createElement('span');
     priority.className = `priority priority-${todo.priority}`;
     priority.textContent = `${todo.priority} priority`;
+
+    const completeButton = document.createElement('button');
+    completeButton.type = 'button';
+    completeButton.textContent = todo.completed ? 'Undo' : 'Complete';
+
+    completeButton.addEventListener('click', () => {
+      toggleTodoCompleted(todo.id);
+    });
 
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
@@ -72,8 +157,14 @@ const renderTodos = (): void => {
       removeTodo(todo.id);
     });
 
-    li.append(text, priority, removeButton);
-    todoList.appendChild(li);
+    listItem.append(
+      text,
+      priority,
+      completeButton,
+      removeButton
+    );
+
+    todoList.appendChild(listItem);
   });
 };
 
@@ -83,32 +174,19 @@ todoForm.addEventListener('submit', (event: SubmitEvent) => {
   const text = todoInput.value.trim();
   const priority = priorityInput.value as Priority;
 
-  if (text !== '') {
-    addTodo(text, priority);
-    todoInput.value = '';
-    priorityInput.value = 'medium';
+  if (text === '') {
+    return;
   }
+
+  addTodo(text, priority);
+
+  todoInput.value = '';
+  priorityInput.value = 'medium';
 });
 
-
-})
-
-const addRemoveButtonListener = (li: HTMLLIElement, id: number):void => {
-  const removeButton = li.querySelector('.remove-button');
-  removeButton?.addEventListener('click', () => {removeTodo(id)});
-    
-}
-
-const addToggleCompletedButtonListener = (li: HTMLLIElement, id: number):void => {
-  const completeButton = li.querySelector('.complete-button');
-  completeButton?.addEventListener('click', () => {
-    todos = toggleCompleted(todos, id);
-    renderTodos();
-  });
-}
-
-const removeTodo = (id:number):void => {
-  todos = todos.filter(todo => todo.id !== id);
+filterInput.addEventListener('change', () => {
+  currentFilter = filterInput.value as TodoFilter;
   renderTodos();
-}
+});
+
 renderTodos();
