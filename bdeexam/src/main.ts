@@ -1,8 +1,9 @@
 import './style.css';
 import { initializeColorPicker } from './features/color-picker';
 
+// ==================== PRIORITY FEATURE: START ====================
+
 type Priority = 'low' | 'medium' | 'high';
-type TodoFilter = 'all' | 'completed' | 'not-completed' | Priority;
 
 interface Todo {
   id: number;
@@ -11,36 +12,23 @@ interface Todo {
   completed: boolean;
 }
 
-let todos: Todo[] = [];
-let currentFilter: TodoFilter = 'all';
-
-const todoInput = document.getElementById('todo-input');
-
-if (!(todoInput instanceof HTMLInputElement)) {
-  throw new Error('Todo input element was not found.');
-}
-
 const priorityInput = document.getElementById('priority-input');
 
 if (!(priorityInput instanceof HTMLSelectElement)) {
   throw new Error('Priority input element was not found.');
 }
 
-const todoForm = document.querySelector('.todo-form');
+// ===================== PRIORITY FEATURE: END =====================
 
-if (!(todoForm instanceof HTMLFormElement)) {
-  throw new Error('Todo form element was not found.');
-}
+// ===================== FILTER FEATURE: START =====================
 
-const todoList = document.getElementById('todo-list');
+type TodoFilter = 'all' | 'completed' | 'not-completed' | Priority;
 
-if (!(todoList instanceof HTMLUListElement)) {
-  throw new Error('Todo list element was not found.');
-}
+let currentFilter: TodoFilter = 'all';
 
-initializeColorPicker(document);
-
-const createFilterInput = (): HTMLSelectElement => {
+const createFilterInput = (
+  todoForm: HTMLFormElement
+): HTMLSelectElement => {
   const existingFilterInput = document.getElementById('filter-input');
 
   if (existingFilterInput instanceof HTMLSelectElement) {
@@ -76,36 +64,10 @@ const createFilterInput = (): HTMLSelectElement => {
   return filterSelect;
 };
 
-const filterInput = createFilterInput();
-
-const addTodo = (text: string, priority: Priority): void => {
-  const newTodo: Todo = {
-    id: Date.now(),
-    text,
-    priority,
-    completed: false
-  };
-
-  todos.push(newTodo);
-  renderTodos();
-};
-
-const removeTodo = (id: number): void => {
-  todos = todos.filter(todo => todo.id !== id);
-  renderTodos();
-};
-
-const toggleTodoCompleted = (id: number): void => {
-  todos = todos.map(todo =>
-    todo.id === id
-      ? { ...todo, completed: !todo.completed }
-      : todo
-  );
-
-  renderTodos();
-};
-
-const getFilteredTodos = (): Todo[] => {
+const getFilteredTodos = (
+  todos: Todo[],
+  currentFilter: TodoFilter
+): Todo[] => {
   switch (currentFilter) {
     case 'completed':
       return todos.filter(todo => todo.completed);
@@ -123,10 +85,73 @@ const getFilteredTodos = (): Todo[] => {
   }
 };
 
+// ====================== FILTER FEATURE: END ======================
+
+let todos: Todo[] = [];
+
+const todoInput = document.getElementById('todo-input');
+
+if (!(todoInput instanceof HTMLInputElement)) {
+  throw new Error('Todo input element was not found.');
+}
+
+const todoForm = document.querySelector('.todo-form');
+
+if (!(todoForm instanceof HTMLFormElement)) {
+  throw new Error('Todo form element was not found.');
+}
+
+const todoList = document.getElementById('todo-list');
+
+if (!(todoList instanceof HTMLUListElement)) {
+  throw new Error('Todo list element was not found.');
+}
+
+const filterInput = createFilterInput(todoForm);
+
+initializeColorPicker(document);
+
+// ==================== PRIORITY FEATURE: START ====================
+
+const addTodo = (text: string, priority: Priority): void => {
+  const newTodo: Todo = {
+    id: Date.now(),
+    text,
+    priority,
+    completed: false
+  };
+
+  todos.push(newTodo);
+  renderTodos();
+};
+
+// ===================== PRIORITY FEATURE: END =====================
+
+const removeTodo = (id: number): void => {
+  todos = todos.filter(todo => todo.id !== id);
+  renderTodos();
+};
+
+const toggleTodoCompleted = (id: number): void => {
+  todos = todos.map(todo =>
+    todo.id === id
+      ? { ...todo, completed: !todo.completed }
+      : todo
+  );
+
+  renderTodos();
+};
+
 const renderTodos = (): void => {
   todoList.innerHTML = '';
 
-  getFilteredTodos().forEach(todo => {
+  // ===================== FILTER FEATURE: START =====================
+
+  const visibleTodos = getFilteredTodos(todos, currentFilter);
+
+  // ====================== FILTER FEATURE: END ======================
+
+  visibleTodos.forEach(todo => {
     const listItem = document.createElement('li');
     listItem.className = 'todo-item';
 
@@ -137,9 +162,13 @@ const renderTodos = (): void => {
       text.className = 'completed';
     }
 
+    // ==================== PRIORITY FEATURE: START ====================
+
     const priority = document.createElement('span');
     priority.className = `priority priority-${todo.priority}`;
     priority.textContent = `${todo.priority} priority`;
+
+    // ===================== PRIORITY FEATURE: END =====================
 
     const completeButton = document.createElement('button');
     completeButton.type = 'button';
@@ -172,7 +201,12 @@ todoForm.addEventListener('submit', (event: SubmitEvent) => {
   event.preventDefault();
 
   const text = todoInput.value.trim();
+
+  // ==================== PRIORITY FEATURE: START ====================
+
   const priority = priorityInput.value as Priority;
+
+  // ===================== PRIORITY FEATURE: END =====================
 
   if (text === '') {
     return;
@@ -184,9 +218,13 @@ todoForm.addEventListener('submit', (event: SubmitEvent) => {
   priorityInput.value = 'medium';
 });
 
+// ===================== FILTER FEATURE: START =====================
+
 filterInput.addEventListener('change', () => {
   currentFilter = filterInput.value as TodoFilter;
   renderTodos();
 });
+
+// ====================== FILTER FEATURE: END ======================
 
 renderTodos();
