@@ -1,3 +1,8 @@
+import './style.css'
+import { setupCounter } from './counter'
+import { initializeColorPicker } from './features/color-picker'
+import { toggleCompleted } from './features/toggle-completed'
+import type { Todo } from './features/toggle-completed'
 import './style.css';
 import { initializeColorPicker } from './features/color-picker';
 
@@ -24,7 +29,20 @@ if (!(priorityInput instanceof HTMLSelectElement)) {
 
 type TodoFilter = 'all' | 'completed' | 'not-completed' | Priority;
 
+<<<<<<< HEAD
 let currentFilter: TodoFilter = 'all';
+=======
+if (!(todoList instanceof HTMLUListElement)) {
+  throw new Error('Todo list element was not found.');
+}
+const todoInput = document.getElementById('todo-input') as HTMLInputElement;
+const priorityInput = document.getElementById('priority-input') as HTMLSelectElement;
+const todoForm = document.querySelector('.todo-form') as HTMLFormElement;
+const todoList = document.getElementById('todo-list') as HTMLUListElement;
+const counterButton = document.getElementById('counter-button') as HTMLButtonElement;
+
+setupCounter(counterButton);
+>>>>>>> c98ddd27bfbc9691737030a568c6d704f656725c
 
 const createFilterInput = (
   todoForm: HTMLFormElement
