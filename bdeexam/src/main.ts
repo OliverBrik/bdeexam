@@ -1,4 +1,5 @@
 import './style.css'
+import { setupCounter } from './counter'
 
 
 // structure of the data schema
@@ -13,6 +14,9 @@ let todos: Todo[] = [];
 const todoInput = document.getElementById('todo-input') as HTMLInputElement;
 const todoForm = document.querySelector('.todo-form') as HTMLFormElement;
 const todoList = document.getElementById('todo-list') as HTMLUListElement;
+const counterButton = document.getElementById('counter-button') as HTMLButtonElement;
+
+setupCounter(counterButton);
 
 const addTodo = (text:string):void => {
   const newTodo: Todo = {
@@ -68,4 +72,3 @@ const removeTodo = (id:number):void => {
   todos = todos.filter(todo => todo.id !== id);
   renderTodos();
 }
-
