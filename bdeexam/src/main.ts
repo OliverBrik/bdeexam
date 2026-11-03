@@ -1,4 +1,5 @@
 import './style.css'
+import { initializeColorPicker } from './features/color-picker'
 import { toggleCompleted } from './features/toggle-completed'
 import type { Todo } from './features/toggle-completed'
 import './style.css';
@@ -20,6 +21,9 @@ const priorityInput = document.getElementById('priority-input') as HTMLSelectEle
 const todoForm = document.querySelector('.todo-form') as HTMLFormElement;
 const todoList = document.getElementById('todo-list') as HTMLUListElement;
 
+initializeColorPicker(document);
+
+const addTodo = (text:string):void => {
 const addTodo = (text: string, priority: Priority): void => {
   const newTodo: Todo = {
     id: Date.now(),
