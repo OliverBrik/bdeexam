@@ -1,3 +1,8 @@
+import './style.css'
+import { setupCounter } from './counter'
+import { initializeColorPicker } from './features/color-picker'
+import { toggleCompleted } from './features/toggle-completed'
+import type { Todo } from './features/toggle-completed'
 import './style.css';
 import { initializeColorPicker } from './features/color-picker';
 
@@ -37,6 +42,13 @@ const todoList = document.getElementById('todo-list');
 if (!(todoList instanceof HTMLUListElement)) {
   throw new Error('Todo list element was not found.');
 }
+const todoInput = document.getElementById('todo-input') as HTMLInputElement;
+const priorityInput = document.getElementById('priority-input') as HTMLSelectElement;
+const todoForm = document.querySelector('.todo-form') as HTMLFormElement;
+const todoList = document.getElementById('todo-list') as HTMLUListElement;
+const counterButton = document.getElementById('counter-button') as HTMLButtonElement;
+
+setupCounter(counterButton);
 
 initializeColorPicker(document);
 
